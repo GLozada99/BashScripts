@@ -1,9 +1,23 @@
 #!/bin/bash
+#Adds first argument as a prefix of next arguments. If just one argument isprovided, adds prefix to all files on directory
+#Ex: $ addPrefix.sh myprefix_ file1 file2 file3 
+#ls -> myprefix_file1 myprefix_file2 myprefix_file3
 
-for item in "$@"
-do
-    if [[ $item == $1 ]]; then 
-        continue
+if [[ "$#" == 1 ]]; then
+    echo -n "Do you want to add prefix to all files in the directory? [Y/n] "
+    read answer
+    if [[ "$answer" == "Y" || "$answer" == "y" ]]; then
+        for fil in "$(pwd)"/*; do 
+            basefil=$(basename "$fil")
+            mv "$fil" "$1""$basefil"
+        done
     fi
-    mv "$item" "$1""$item"
-done 
+elif [[ "$#" > 1 ]]; then
+    for item in "$@"
+    do
+        if [[ $item == $1 ]]; then 
+            continue
+        fi
+        mv "$item" "$1""$item"
+    done 
+fi
