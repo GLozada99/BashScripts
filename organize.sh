@@ -1,15 +1,13 @@
 #!/bin/bash
-# Fix the apt update errors in Ubuntu / Linux Mint
-# Demonstrated for fun by guys at ihaveapc.com
+#Move the files in current directory to other directories acording to their prefix
 
 ADDRESS='/media/gustavolozada/7468CF1D68CEDCCC/Users/gusgo/Desktop/MyThings'
 
-#var=1
 for fil in "$(pwd)"/*; do 
         
-    basefil=$(basename "$fil") #get name of file
+    basefil=$(basename "$fil") 
     name=${basefil// /_}
-    #mv "$fil" "$name"
+    
     if [[ $basefil == "Antenas_"* ]]; then
         echo $basefil
         mv "$fil" $ADDRESS/Antenas/"$name"
