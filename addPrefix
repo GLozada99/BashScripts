@@ -13,11 +13,7 @@ if [[ "$#" == 1 ]]; then
         done
     fi
 elif [[ "$#" > 1 ]]; then
-    for item in "$@"
-    do
-        if [[ $item == $1 ]]; then 
-            continue
-        fi
+    for number in "${@:2}"; do
         mv "$item" "$1""$item"
     done 
 fi
