@@ -1,0 +1,83 @@
+#!/bin/bash
+#Shows my list of things to do that are not done (-n)
+#Shows my list of things to do that are done (-d)
+#Shows all things on the list (-n)
+
+cd ~/Documents/Books/Docs/
+readonly with_done=8
+readonly without_done=3
+
+full_list () {
+    if [[ $last_char == "e" ]]; then #last thing is "Done"
+        sub=$length-$with_done
+    elif [[ $last_char == "-" ]]; then #last thing is --
+        sub=$length-$without_done
+    fi
+    result=${line:0:$sub}
+    echo "$result"
+}
+
+done_list () {
+    if [[ $last_char == "e" ]]; then #last thing is "Done"
+        sub=$length-$with_done
+    elif [[ $last_char == "-" ]]; then #last thing is --
+        sub=0
+    fi
+    result=${line:0:$sub}
+    echo "$result"
+}
+
+not_done_list () {
+    if [[ $last_char == "e" ]]; then #last thing is "Done"
+        sub=0
+    elif [[ $last_char == "-" ]]; then #last thing is --
+        sub=$length-$without_done
+    fi
+    result=${line:0:$sub}
+    echo "$result"
+}
+
+cat ThingsToDo | while read line; do #loop through the file line by line
+    first_char=${line:0:1} #parameter:offset:length
+    
+    if [[ $first_char =~ [0-9] ]]; then
+        length=${#line}
+        last_char=${line:$length-1:1} 
+        if [[ $# == 1 ]]; then
+            case $1 in 
+                "-n")
+                    substring="$(not_done_list)"
+                ;;
+                "-d")
+                    substring="$(done_list)"
+                ;;
+                "-f")
+                    substring="$(full_list)"
+                ;;
+                "--help")
+                    echo " -n         list things not done"
+                    echo " -d         list things done"
+                    echo " -f         full list"
+                    echo " -sd        set following arguments done (by number)"
+                    echo " -nd        set following arguments undone (if they are done)"
+                    break
+                ;;
+            esac    
+            
+            if [[ ${#substring} == 0 ]]; then
+                continue
+            fi
+            echo $substring 
+            
+        elif [[ $# > 1 ]]; then
+            case $1 in 
+                "-sd")
+                    echo "set done"
+                ;;
+                "-nd")
+                    echo "not done"
+                ;;
+            esac  
+        fi  
+    fi
+done
