@@ -6,6 +6,7 @@
 cd ~/Documents/Books/Docs/
 readonly with_done=8
 readonly without_done=3
+readonly done_space=5
 
 full_list () {
     if [[ $last_char == "e" ]]; then #last thing is "Done"
@@ -37,13 +38,57 @@ not_done_list () {
     echo "$result"
 }
 
-cat ThingsToDo | while read line; do #loop through the file line by line
-    first_char=${line:0:1} #parameter:offset:length
-    
-    if [[ $first_char =~ [0-9] ]]; then
+help () {
+    echo " -n         list things not done"
+    echo " -d         list things done"
+    echo " -f         full list"
+    echo " -sd        set following arguments done (by number)"
+    echo " -nd        set following arguments undone (if they are done)"
+}
+
+set_done () {
+    for num in "${@:2}"; do #slices the @ so that it can loop from 2nd arg
+        num_length=${#num}
+        
+        cat ThingsToDo | while read line; do
+            list_num=${line:0:num_length}
+            length=${#line}
+            last_char=${line:$length-1:1} 
+            
+            if [[ $num == $list_num && $last_char != "e" ]]; then
+                replace=$line" Done"
+                sed -i "s/$line/$replace/" ThingsToDo
+                break
+            fi
+        done    
+    done
+}
+
+set_not_done () {
+    for num in "${@:2}"; do #slices the @ so that it can loop from 2nd arg
+        num_length=${#num}
+        
+        cat ThingsToDo | while read line; do
+            list_num=${line:0:num_length}
+            length=${#line}
+            last_char=${line:$length-1:1} 
+            
+            if [[ $num == $list_num && $last_char == "e" ]]; then
+                replace=${line:0:$length-$done_space} #takes "Done "
+                sed -i "s/$line/$replace/" ThingsToDo
+                break
+            fi
+        done    
+    done
+}
+
+if [[ $# == 1 ]]; then
+    cat ThingsToDo | while read line; do #loop through the file line by line
+        first_char=${line:0:1} #parameter:offset:length
+        
         length=${#line}
         last_char=${line:$length-1:1} 
-        if [[ $# == 1 ]]; then
+        
             case $1 in 
                 "-n")
                     substring="$(not_done_list)"
@@ -55,11 +100,7 @@ cat ThingsToDo | while read line; do #loop through the file line by line
                     substring="$(full_list)"
                 ;;
                 "--help")
-                    echo " -n         list things not done"
-                    echo " -d         list things done"
-                    echo " -f         full list"
-                    echo " -sd        set following arguments done (by number)"
-                    echo " -nd        set following arguments undone (if they are done)"
+                    help
                     break
                 ;;
             esac    
@@ -67,17 +108,17 @@ cat ThingsToDo | while read line; do #loop through the file line by line
             if [[ ${#substring} == 0 ]]; then
                 continue
             fi
-            echo $substring 
-            
-        elif [[ $# > 1 ]]; then
-            case $1 in 
-                "-sd")
-                    echo "set done"
-                ;;
-                "-nd")
-                    echo "not done"
-                ;;
-            esac  
-        fi  
-    fi
-done
+            echo $substring   
+    done
+elif [[ $# > 1 ]]; then
+    case $1 in 
+        "-sd")
+            set_done $@
+        ;;
+        "-sn")
+            set_not_done $@
+        ;;
+    esac  
+fi  
+
+
