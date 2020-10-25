@@ -3,7 +3,7 @@
 #Shows my list of things to do that are done (-d)
 #Shows all things on the list (-n)
 
-cd ~/Documents/Books/Docs/
+cd ~/Documents/Docs/
 readonly with_done=8
 readonly without_done=3
 readonly done_space=5
@@ -43,7 +43,7 @@ help () {
     echo " -d         list things done"
     echo " -f         full list"
     echo " -sd        set following arguments done (by number)"
-    echo " -nd        set following arguments undone (if they are done)"
+    echo " -sn        set following arguments undone (if they are done)"
 }
 
 set_done () {
