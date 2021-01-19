@@ -1,0 +1,35 @@
+#!/bin/bash
+
+cd /home/gustavolozada/Documents/Programing/BashScripts
+flag=false
+final=true
+while read line; do
+    count=$(echo "$line" | wc -w)
+    if [[ $flag = true ]]; then
+        #echo $line" b"
+        pactl set-default-sink $line
+        replace=$line" D"
+        sed -i "s/$line/$replace/" sinks
+        final=false
+        #echo $final
+        break
+    fi
+    if [[ $count = 2 ]]; then
+        #echo $line" a"
+        replace=${line:0:${#line}-2}
+        sed -i "s/$line/$replace/" sinks
+        flag=true
+    fi
+    #index=$((index+1))
+done <<< $(cat sinks)
+echo $final 
+if [[ $final = true ]]; then
+    while read line; do
+        #echo $line" c"
+        pactl set-default-sink $line
+        replace=$line" D"
+        sed -i "s/$line/$replace/" sinks
+        break
+    done <<< $(cat sinks)
+fi
+

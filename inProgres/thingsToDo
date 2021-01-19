@@ -10,10 +10,12 @@ readonly done_space=5
 
 full_list () {
     if [[ $last_char == "e" ]]; then #last thing is "Done"
-        sub=$length-$with_done
+        sub=$((length-3)) #eliminate one
     elif [[ $last_char == "-" ]]; then #last thing is --
-        sub=$length-$without_done
+        sub=$((length+2)) #adding N
+        line="${line} N"
     fi
+    
     result=${line:0:$sub}
     echo "$result"
 }
@@ -39,11 +41,12 @@ not_done_list () {
 }
 
 help () {
-    echo " -n         list things not done"
-    echo " -d         list things done"
+    echo " -n         list tasks not done"
+    echo " -d         list tasks done"
     echo " -f         full list"
-    echo " -sd        set following arguments done (by number)"
-    echo " -sn        set following arguments undone (if they are done)"
+    echo " -sd        set following tasks done (by number)"
+    echo " -sn        set following tasks undone (if they are done)"
+    echo " -a         add task with the format: 'Task -- day month'"
 }
 
 set_done () {
@@ -79,6 +82,32 @@ set_not_done () {
                 break
             fi
         done    
+    done
+}
+
+add () {
+    elements=$(wc -l < ThingsToDo) #wc prints name of file by default. To avoid it, I used < 
+    elements=$((elements+1))
+    echo "$elements. "${*:2}" --">>ThingsToDo # $((2+1)) is the arithmetic expansion operator
+}
+
+remove () {
+    for num in "${@:2}"; do
+        sed -i "/$num./d" ThingsToDo
+        cat ThingsToDo
+    done
+}
+
+fix_numbers () {
+    index=1        
+    cat ThingsToDo | while read line; do
+        num_length=${#index}
+        list_num=${line:0:num_length}
+        if [[ $index != $list_num ]]; then
+            #sed -i "s/$list_num./$index./" ThingsToDo
+            sed "s/$list_num./$index./" ThingsToDo
+        fi
+        index=$((index+1))
     done
 }
 
@@ -118,7 +147,13 @@ elif [[ $# > 1 ]]; then
         "-sn")
             set_not_done $@
         ;;
+        "-a") 
+            add $@
+        ;;
+        "-r") 
+            remove $@
+        ;;
     esac  
-fi  
+fi
 
 
