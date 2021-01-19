@@ -1,0 +1,10 @@
+#!/bin/bash
+python /home/gustavolozada/Documents/Programing/PyPrograming/create_project.py $1 #Path to python script on your PC
+GITUSER='GLozada99' #Github Username
+cd $1
+echo " "
+git init
+git remote add origin git@github.com:"$GITUSER/$1".git  
+echo " " 
+git status
+
